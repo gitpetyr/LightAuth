@@ -1,0 +1,6 @@
+# 修改触发条件
+on:
+  push:
+    branches: ["**"]  # 任何分支的 push 都触发
+  workflow_dispatch:
+ 

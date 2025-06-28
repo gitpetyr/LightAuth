@@ -102,6 +102,21 @@ QGroupBox::title {
     subcontrol-position: top left;
     padding: 0 5px;
 }
+
+QComboBox {
+    padding: 6px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background-color: #ffffff;
+    color: #000000;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    selection-background-color: #e0e0e0;
+    selection-color: #000000;
+}
 """
 
 DARK_STYLE = """

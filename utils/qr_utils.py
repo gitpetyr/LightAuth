@@ -1,8 +1,9 @@
 from PIL import Image
-from pyzbar.pyzbar import decode
 from urllib.parse import urlparse, parse_qs, unquote
 from typing import List, Tuple, Dict, Optional
 
+# 直接使用 pyzbar 作为唯一二维码解析库
+from pyzbar.pyzbar import decode as _zbar_decode  # type: ignore
 
 def decode_qr_from_image(image: Image.Image) -> List[Tuple[str, Tuple[int, int, int, int]]]:
     """从PIL图像中解码所有二维码。
@@ -12,11 +13,18 @@ def decode_qr_from_image(image: Image.Image) -> List[Tuple[str, Tuple[int, int, 
     Returns:
         包含元组(data, rect) 的列表，其中 data 为二维码中的原始字符串，rect 为 (x, y, w, h)。
     """
-    results = decode(image)
-    decoded = []
+    results = _zbar_decode(image)
+    if not results:
+        # 若未识别到二维码，尝试反色后再次识别（将黑底白码转换为白底黑码）
+        from PIL import ImageOps
+        inverted = ImageOps.invert(image.convert("RGB"))
+        results = _zbar_decode(inverted)
+
+    decoded: List[Tuple[str, Tuple[int, int, int, int]]] = []
     for r in results:
-        data = r.data.decode("utf-8", errors="ignore")
-        rect = (r.rect.left, r.rect.top, r.rect.width, r.rect.height)
+        data = r.data.decode("utf-8", errors="ignore")  # type: ignore[attr-defined]
+        rect_obj = r.rect  # type: ignore[attr-defined]
+        rect = (rect_obj.left, rect_obj.top, rect_obj.width, rect_obj.height)
         decoded.append((data, rect))
     return decoded
 
