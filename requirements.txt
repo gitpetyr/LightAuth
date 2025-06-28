@@ -5,4 +5,7 @@ Pyqt6_sip==13.10.2
 qrcode==7.4.2
 pillow==10.1.0
 cryptography==41.0.5
-pyperclip==1.8.2 
+pyperclip==1.8.2
+pyzbar==0.1.9
+opencv-python==4.9.0.80
+numpy==1.26.4 

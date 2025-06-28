@@ -150,10 +150,25 @@ class SettingsDialog(QDialog):
     
     def accept(self):
         """确认设置"""
-        # 验证密码
-        if not self.validate_passwords():
-            return
-            
+        encryption_enabled_before = self.config.get("encryption_enabled", False)
+        encryption_enabled_after = self.encryption_check.isChecked()
+        new_password_set = bool(self.new_password_edit.text())
+
+        # 定义一个安全相关的操作是否正在发生
+        is_security_change = (encryption_enabled_before != encryption_enabled_after) or new_password_set
+
+        # 如果之前已启用加密，则任何安全相关的更改都需要当前密码
+        if encryption_enabled_before and is_security_change:
+            if not self.current_password_edit.text():
+                QMessageBox.warning(self, "警告", "要更改或禁用加密，请输入当前密码")
+                return
+
+        # 如果正在设置新密码，需要验证两次输入是否一致
+        if new_password_set:
+            if self.new_password_edit.text() != self.confirm_password_edit.text():
+                QMessageBox.warning(self, "警告", "两次输入的密码不一致")
+                return
+
         # 保存主题设置
         theme_index = self.theme_combo.currentIndex()
         self.config["theme"] = self.theme_combo.itemData(theme_index)
@@ -163,10 +178,10 @@ class SettingsDialog(QDialog):
         self.config["show_seconds"] = self.show_seconds_check.isChecked()
         
         # 保存加密设置
-        self.config["encryption_enabled"] = self.encryption_check.isChecked()
+        self.config["encryption_enabled"] = encryption_enabled_after
         
-        # 将新密码保存到临时变量中，以便主窗口处理
-        if self.encryption_check.isChecked():
+        # 仅当发生安全相关的更改时，才传递密码
+        if is_security_change:
             self.config["temp_current_password"] = self.current_password_edit.text()
             self.config["temp_new_password"] = self.new_password_edit.text()
         

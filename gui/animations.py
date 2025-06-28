@@ -72,6 +72,9 @@ class SlideAnimation:
         animation.setDuration(duration)
         animation.setEasingCurve(QEasingCurve.Type.OutCubic)
         
+        # 确保动画之前部件可见
+        widget.setVisible(True)
+        
         # 根据方向设置起始位置
         start_geo = geo.translated(
             geo.width() if direction == "left" else (-geo.width() if direction == "right" else 0),
@@ -114,9 +117,13 @@ class SlideAnimation:
         animation.setStartValue(geo)
         animation.setEndValue(end_geo)
         
-        if finished_callback:
-            animation.finished.connect(finished_callback)
+        # 确保动画结束后执行回调，但不要隐藏部件
+        original_callback = finished_callback
+        def safe_callback():
+            if original_callback:
+                original_callback()
         
+        animation.finished.connect(safe_callback)
         animation.start()
         return animation
 

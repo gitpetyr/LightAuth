@@ -6,10 +6,28 @@ import os
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QCheckBox,
     QPushButton, QLabel, QLineEdit, QFileDialog,
-    QListWidget, QListWidgetItem, QMessageBox, QGroupBox
+    QListWidget, QListWidgetItem, QMessageBox, QGroupBox, QWidget
 )
 from PyQt6.QtCore import Qt
 from utils.config import encrypt_data
+
+class CheckableAccountItemWidget(QWidget):
+    """自定义的可勾选账户条目，包含一个真实的复选框"""
+    def __init__(self, text, parent=None):
+        super().__init__(parent)
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(5, 5, 5, 5)
+        self.checkbox = QCheckBox()
+        self.label = QLabel(text)
+        layout.addWidget(self.checkbox)
+        layout.addWidget(self.label)
+        layout.addStretch(1)
+
+    def is_checked(self):
+        return self.checkbox.isChecked()
+
+    def set_checked(self, checked):
+        self.checkbox.setChecked(checked)
 
 class ExportDialog(QDialog):
     """账户导出对话框"""
@@ -42,11 +60,12 @@ class ExportDialog(QDialog):
         
         # 账户列表
         self.accounts_list = QListWidget()
-        for i, account in enumerate(self.accounts):
-            item = QListWidgetItem(f"{account.name} ({account.issuer})")
-            item.setFlags(item.flags() | Qt.ItemFlag.ItemIsUserCheckable)
-            item.setCheckState(Qt.CheckState.Unchecked)
-            self.accounts_list.addItem(item)
+        for account in self.accounts:
+            item = QListWidgetItem(self.accounts_list)
+            widget = CheckableAccountItemWidget(f"{account.name} ({account.issuer})")
+            widget.checkbox.stateChanged.connect(self.update_select_all_state)
+            item.setSizeHint(widget.sizeHint())
+            self.accounts_list.setItemWidget(item, widget)
         
         accounts_layout.addWidget(self.accounts_list)
         accounts_group.setLayout(accounts_layout)
@@ -91,12 +110,26 @@ class ExportDialog(QDialog):
         
         layout.addLayout(btn_layout)
     
+    def update_select_all_state(self):
+        """当单个条目状态改变时，更新"全选"复选框的状态"""
+        all_checked = True
+        for i in range(self.accounts_list.count()):
+            widget = self.accounts_list.itemWidget(self.accounts_list.item(i))
+            if widget and not widget.is_checked():
+                all_checked = False
+                break
+        
+        # 临时阻塞信号，避免触发toggle_select_all导致循环
+        self.select_all_cb.blockSignals(True)
+        self.select_all_cb.setChecked(all_checked)
+        self.select_all_cb.blockSignals(False)
+
     def toggle_select_all(self, checked):
         """全选/取消全选"""
         for i in range(self.accounts_list.count()):
-            self.accounts_list.item(i).setCheckState(
-                Qt.CheckState.Checked if checked else Qt.CheckState.Unchecked
-            )
+            widget = self.accounts_list.itemWidget(self.accounts_list.item(i))
+            if widget:
+                widget.set_checked(checked)
     
     def toggle_password_field(self, checked):
         """切换密码字段状态"""
@@ -107,8 +140,8 @@ class ExportDialog(QDialog):
         """获取选中的账户"""
         selected_accounts = []
         for i in range(self.accounts_list.count()):
-            item = self.accounts_list.item(i)
-            if item.checkState() == Qt.CheckState.Checked:
+            widget = self.accounts_list.itemWidget(self.accounts_list.item(i))
+            if widget and widget.is_checked():
                 selected_accounts.append(self.accounts[i])
                 self.selected_indices.append(i)
         return selected_accounts

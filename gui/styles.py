@@ -11,7 +11,7 @@ QMainWindow {
 }
 
 QWidget {
-    font-family: "Microsoft YaHei", "微软雅黑", "SimHei", "黑体";
+    font-family: "Noto Sans CJK SC", "Source Han Sans SC", "PingFang SC", "Hiragino Sans GB", "WenQuanYi Micro Hei", sans-serif;
 }
 
 QListWidget {
@@ -112,7 +112,7 @@ QMainWindow, QDialog {
 
 QWidget {
     color: #f0f0f0;
-    font-family: "Microsoft YaHei", "微软雅黑", "SimHei", "黑体";
+    font-family: "Noto Sans CJK SC", "Source Han Sans SC", "PingFang SC", "Hiragino Sans GB", "WenQuanYi Micro Hei", sans-serif;
 }
 
 QListWidget {

@@ -6,11 +6,30 @@ import os
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QCheckBox,
     QPushButton, QLabel, QLineEdit, QFileDialog,
-    QListWidget, QListWidgetItem, QMessageBox, QGroupBox
+    QListWidget, QListWidgetItem, QMessageBox, QGroupBox, QWidget
 )
 from PyQt6.QtCore import Qt
 from utils.config import decrypt_data
 from models.otp_model import OTPAccount
+
+class CheckableAccountItemWidget(QWidget):
+    """自定义的可勾选账户条目，包含一个真实的复选框"""
+    def __init__(self, text, parent=None):
+        super().__init__(parent)
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(5, 5, 5, 5)
+        self.checkbox = QCheckBox()
+        self.checkbox.setChecked(True)  # 默认勾选
+        self.label = QLabel(text)
+        layout.addWidget(self.checkbox)
+        layout.addWidget(self.label)
+        layout.addStretch(1)
+
+    def is_checked(self):
+        return self.checkbox.isChecked()
+
+    def set_checked(self, checked):
+        self.checkbox.setChecked(checked)
 
 class ImportDialog(QDialog):
     """账户导入对话框"""
@@ -73,6 +92,7 @@ class ImportDialog(QDialog):
         # 全选/取消全选
         select_layout = QHBoxLayout()
         self.select_all_cb = QCheckBox("全选")
+        self.select_all_cb.setChecked(True)
         self.select_all_cb.clicked.connect(self.toggle_select_all)
         select_layout.addWidget(self.select_all_cb)
         select_layout.addStretch()
@@ -180,23 +200,37 @@ class ImportDialog(QDialog):
             issuer = account_data.get('issuer', '')
             display_text = f"{name} ({issuer})" if issuer else name
             
-            item = QListWidgetItem(display_text)
-            item.setFlags(item.flags() | Qt.ItemFlag.ItemIsUserCheckable)
-            item.setCheckState(Qt.CheckState.Checked)
-            item.setData(Qt.ItemDataRole.UserRole, account_data)
-            self.accounts_list.addItem(item)
+            item = QListWidgetItem(self.accounts_list)
+            widget = CheckableAccountItemWidget(display_text)
+            widget.checkbox.stateChanged.connect(self.update_select_all_state)
+            item.setSizeHint(widget.sizeHint())
+            item.setData(Qt.ItemDataRole.UserRole, account_data) # 仍然需要存储原始数据
+            self.accounts_list.setItemWidget(item, widget)
         
         # 显示账户选择区域
         self.password_group.setVisible(False)
         self.accounts_group.setVisible(True)
         self.import_btn.setEnabled(True)
     
+    def update_select_all_state(self):
+        """当单个条目状态改变时，更新"全选"复选框的状态"""
+        all_checked = True
+        for i in range(self.accounts_list.count()):
+            widget = self.accounts_list.itemWidget(self.accounts_list.item(i))
+            if widget and not widget.is_checked():
+                all_checked = False
+                break
+        
+        self.select_all_cb.blockSignals(True)
+        self.select_all_cb.setChecked(all_checked)
+        self.select_all_cb.blockSignals(False)
+    
     def toggle_select_all(self, checked):
         """全选/取消全选"""
         for i in range(self.accounts_list.count()):
-            self.accounts_list.item(i).setCheckState(
-                Qt.CheckState.Checked if checked else Qt.CheckState.Unchecked
-            )
+            widget = self.accounts_list.itemWidget(self.accounts_list.item(i))
+            if widget:
+                widget.set_checked(checked)
     
     def import_accounts(self):
         """导入账户"""
@@ -204,8 +238,9 @@ class ImportDialog(QDialog):
         
         # 收集选中的账户
         for i in range(self.accounts_list.count()):
-            item = self.accounts_list.item(i)
-            if item.checkState() == Qt.CheckState.Checked:
+            item = self.accounts_list.item(i) # item用于获取数据
+            widget = self.accounts_list.itemWidget(item) # widget用于获取勾选状态
+            if widget and widget.is_checked():
                 account_data = item.data(Qt.ItemDataRole.UserRole)
                 if account_data:
                     otp_account = OTPAccount.from_dict(account_data)

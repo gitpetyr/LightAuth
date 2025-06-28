@@ -1,8 +1,8 @@
 {
-    "theme": "light",
+    "theme": "dark",
     "auto_copy": true,
     "show_seconds": true,
     "startup": true,
     "encryption_enabled": true,
-    "encryption_password_hash": "b2b84f1fc3202cdccf412aa4313261d68a2d0232b836f883de5f8a1086dea368"
+    "encryption_password_hash": "75fa629f299a4f1049a0a246cad935bdbdd101295af5192a25ad69fce6380c49"
 }

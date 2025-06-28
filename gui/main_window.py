@@ -4,6 +4,7 @@
 import time
 import threading
 import os
+import hashlib
 from PyQt6.QtWidgets import (
     QMainWindow, QVBoxLayout, QHBoxLayout, 
     QWidget, QPushButton, QLabel, QScrollArea,
@@ -25,8 +26,10 @@ from gui.otp_item_widget import OTPItemWidget
 from gui.export_dialog import ExportDialog
 from gui.import_dialog import ImportDialog
 from gui.styles import LIGHT_STYLE, DARK_STYLE
-from gui.animations import FadeAnimation, SlideAnimation
+from gui.animations import SlideAnimation
 
+# 以下指令用于静态类型检查工具，忽略由于动态属性导致的类型错误
+# mypy: ignore-errors
 
 class MainWindow(QMainWindow):
     """主窗口"""
@@ -176,16 +179,6 @@ class MainWindow(QMainWindow):
         
         # 更新账户列表
         self.update_accounts_list()
-        
-        # 应用进入动画
-        self.animate_startup()
-    
-    def animate_startup(self):
-        """应用启动动画"""
-        # 渐显动画
-        for widget in [self.centralWidget()]:
-            anim = FadeAnimation.fade_in(widget, duration=500)
-            self.animations.append(anim)
     
     def create_menus(self):
         """创建菜单"""
@@ -236,17 +229,23 @@ class MainWindow(QMainWindow):
             self.accounts_list.addItem(item)
             self.accounts_list.setItemWidget(item, widget)
             
-            # 添加列表项动画
-            anim = SlideAnimation.slide_in(widget, direction="right", duration=200 + idx * 50)
-            self.animations.append(anim)
+            # 不再使用动画，直接显示
+            # 保留占位，避免anim引用
+            # self.animations.append(None)
     
     def update_otp_codes(self):
         """更新所有OTP码"""
-        for idx in range(self.accounts_list.count()):
-            item = self.accounts_list.item(idx)
-            widget = self.accounts_list.itemWidget(item)
-            if widget:
-                widget.update_otp()
+        if hasattr(self, '_updating_otp') and self._updating_otp:
+            return
+        self._updating_otp = True
+        try:
+            for idx in range(self.accounts_list.count()):
+                item = self.accounts_list.item(idx)
+                widget = self.accounts_list.itemWidget(item)
+                if widget:
+                    widget.update_otp()
+        finally:
+            self._updating_otp = False
     
     def add_account(self):
         """添加新账户"""
@@ -307,9 +306,16 @@ class MainWindow(QMainWindow):
             if new_config.get("encryption_enabled", False):
                 current_password = new_config.get("temp_current_password", "")
                 new_password = new_config.get("temp_new_password", "")
-                
-                # 验证当前密码（如果之前已启用加密）
-                if self.config.get("encryption_enabled", False):
+                # 仅在需要时验证当前密码：
+                # a) 之前已启用加密且用户正在关闭加密
+                # b) 或用户设置了新密码
+                need_verify = False
+                if self.config.get("encryption_enabled", False) and not new_config.get("encryption_enabled", False):
+                    need_verify = True  # 正在关闭加密
+                elif new_password:  # 正在修改密码
+                    need_verify = True
+
+                if need_verify:
                     stored_hash = self.config.get("encryption_password_hash", "")
                     if not verify_password(current_password, stored_hash):
                         QMessageBox.critical(self, "错误", "当前密码不正确")
@@ -350,6 +356,16 @@ class MainWindow(QMainWindow):
             # 如果主题改变，应用新主题
             if old_theme != new_theme:
                 self.apply_theme()
+                # 重新创建账户列表部件以应用新主题颜色
+                self.update_accounts_list()
+
+            # 更新所有已存在账户项的复制提示显示状态
+            auto_copy_enabled = self.config.get("auto_copy", False)
+            for i in range(self.accounts_list.count()):
+                item = self.accounts_list.item(i)
+                widget = self.accounts_list.itemWidget(item)
+                if widget and hasattr(widget, "toggle_copy_hint"):
+                    widget.toggle_copy_hint(auto_copy_enabled)
     
     def save_accounts(self):
         """保存账户数据，使用加密密码（如果启用）"""
@@ -413,4 +429,11 @@ class MainWindow(QMainWindow):
         """窗口关闭事件"""
         # 保存账户数据
         self.save_accounts()
-        event.accept() 
+        event.accept()
+
+    # 启动动画已禁用
+    def animate_startup(self):
+        pass
+    
+    # 保留占位，避免anim引用
+    # self.animations.append(None) 
