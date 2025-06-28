@@ -1,0 +1,8 @@
+{
+    "theme": "light",
+    "auto_copy": true,
+    "show_seconds": true,
+    "startup": true,
+    "encryption_enabled": true,
+    "encryption_password_hash": "b2b84f1fc3202cdccf412aa4313261d68a2d0232b836f883de5f8a1086dea368"
+}

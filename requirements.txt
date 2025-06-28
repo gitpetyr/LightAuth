@@ -1,0 +1,8 @@
+pyotp==2.9.0
+PyQt6==6.9.1
+PyQt6-Qt6==6.9.1
+Pyqt6_sip==13.10.2
+qrcode==7.4.2
+pillow==10.1.0
+cryptography==41.0.5
+pyperclip==1.8.2 
