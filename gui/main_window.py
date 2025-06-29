@@ -302,18 +302,18 @@ class MainWindow(QMainWindow):
         if dialog.exec() == QDialog.DialogCode.Accepted:
             new_config = dialog.get_settings()
             
-            # 处理加密设置
-            if new_config.get("encryption_enabled", False):
+            # 处理加密设置 --------------------------------------------------
+            encryption_was_on = self.config.get("encryption_enabled", False)
+            encryption_enabled_now = new_config.get("encryption_enabled", False)
+
+            # ⇢ A. 目标状态为"启用加密" -----------------------------------
+            if encryption_enabled_now:
                 current_password = new_config.get("temp_current_password", "")
                 new_password = new_config.get("temp_new_password", "")
-                # 仅在需要时验证当前密码：
-                # a) 之前已启用加密且用户正在关闭加密
-                # b) 或用户设置了新密码
-                need_verify = False
-                if self.config.get("encryption_enabled", False) and not new_config.get("encryption_enabled", False):
-                    need_verify = True  # 正在关闭加密
-                elif new_password:  # 正在修改密码
-                    need_verify = True
+
+                # 只有在以前已经开启加密的前提下，才可能需要验证旧密码：
+                # 这里针对的是"修改密码"场景。
+                need_verify = encryption_was_on and bool(new_password)
 
                 if need_verify:
                     stored_hash = self.config.get("encryption_password_hash", "")
@@ -329,15 +329,27 @@ class MainWindow(QMainWindow):
                     # 如果更改了密码，需要重新加密数据
                     self.encryption_password = new_password
                     self.save_accounts()
-                elif not self.config.get("encryption_enabled", False):
-                    # 第一次启用加密但未提供密码（不应该发生，但添加防护）
-                    if not self.config.get("encryption_password_hash", ""):
-                        # 使用一个默认密码，这种情况理论上不应该发生
-                        default_password = "default"
-                        new_config["encryption_password_hash"] = hash_password(default_password)
-                        self.encryption_password = default_password
-                        self.save_accounts()
-                        QMessageBox.warning(self, "警告", "已使用默认密码启用加密，请尽快在设置中修改密码")
+                elif not encryption_was_on:
+                    # 首次启用加密且用户没有输入新密码，阻止保存
+                    QMessageBox.warning(self, "警告", "首次启用加密时必须输入新密码。")
+                    return
+
+            # ⇢ B. 目标状态为"关闭加密" -----------------------------------
+            elif encryption_was_on and not encryption_enabled_now:
+                # 需要验证旧密码
+                stored_hash = self.config.get("encryption_password_hash", "")
+                current_password = new_config.get("temp_current_password", "")
+
+                if not verify_password(current_password, stored_hash):
+                    QMessageBox.critical(self, "错误", "当前密码不正确")
+                    return
+
+                # 清空密码相关信息
+                self.encryption_password = ""
+                new_config["encryption_password_hash"] = ""
+
+                # 将数据重新保存为"无密码加密"形式，以便后续正常读取
+                self.save_accounts()
             
             # 清除临时密码字段
             if "temp_current_password" in new_config:

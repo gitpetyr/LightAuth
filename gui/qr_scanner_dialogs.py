@@ -210,9 +210,13 @@ class ScreenScanDialog(QDialog):
         width = qimage.width()
         height = qimage.height()
         ptr = qimage.bits()
-        # PyQt6 的 sip.voidptr 支持 setsize，直接使用 buffer
-        ptr.setsize(width * height * 4)
-        arr = np.frombuffer(ptr, dtype=np.uint8).reshape((height, width, 4))
+        size = width * height * 4
+
+        # PyQt6 需要 setsize()，PySide6 无此方法但已实现缓冲区协议
+        if hasattr(ptr, "setsize"):
+            ptr.setsize(size)
+
+        arr = np.frombuffer(ptr, dtype=np.uint8, count=size).reshape((height, width, 4))
         pil_img = Image.fromarray(arr, 'RGBA')
 
         decoded = decode_qr_from_image(pil_img)

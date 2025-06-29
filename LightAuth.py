@@ -31,6 +31,13 @@ if sys.platform.startswith("darwin"):
         ):
             sys.modules.setdefault(f"PyQt6.{_sub}", importlib.import_module(f"PySide6.{_sub}"))
 
+        # Provide PyQt-specific helpers
+        from PySide6.QtCore import Signal as _Signal, Slot as _Slot
+        core_mod = sys.modules.get("PyQt6.QtCore")
+        if core_mod:
+            setattr(core_mod, "pyqtSignal", _Signal)
+            setattr(core_mod, "pyqtSlot", _Slot)
+
     except ImportError as exc:
         # Fallback: PySide6 not available, let the regular PyQt6 import fail below
         print("[Warning] Unable to import PySide6 on macOS →", exc, file=sys.stderr)
