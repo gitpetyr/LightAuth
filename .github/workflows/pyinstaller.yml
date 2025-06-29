@@ -32,6 +32,11 @@ jobs:
         run: |
           choco install vcredist2013 -y
 
+      - name: Install VC++ 2015-2022 Redistributable
+        if: runner.os == 'Windows'
+        run: |
+          choco install vcredist140 -y
+
       - name: Build Windows executable
         if: runner.os == 'Windows'
         run: |
