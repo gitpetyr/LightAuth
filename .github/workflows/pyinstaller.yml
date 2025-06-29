@@ -45,7 +45,7 @@ jobs:
       - name: Build macOS app
         if: runner.os == 'macOS'
         run: |
-          python -m nuitka --standalone --assume-yes-for-downloads --macos-create-app-bundle --macos-app-icon="src/LightAuth_logo.icns" --enable-plugin=pyside6 --include-package=pyzbar --include-package-data=pyzbar --include-data-dir=src=src --output-dir=dist LightAuth.py
+          python -m nuitka --standalone --assume-yes-for-downloads --macos-create-app-bundle --macos-app-icon="src/LightAuth_logo.icns" --disable-console --enable-plugin=pyside6 --include-package=pyzbar --include-package-data=pyzbar --include-data-dir=src=src --output-dir=dist LightAuth.py
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
