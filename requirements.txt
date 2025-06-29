@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 
 PyQt6==6.9.1 ; platform_system == "Windows"
-PyQt6-Qt6==6.9.1 ; platform_system == "Windows"
-PyQt6_sip==13.10.2 ; platform_system == "Windows"
-PySide6==6.7.1 ; platform_system == "Darwin"
-PySide6-Qt6==6.7.1 ; platform_system == "Darwin"
-PySide6-Essentials==6.7.1 ; platform_system == "Darwin"
+PySide6==6.9.1 ; platform_system == "Darwin"
 nuitka==1.9.5
 qrcode==7.4.2
 pillow==10.1.0
