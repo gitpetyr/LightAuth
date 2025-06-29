@@ -1,4 +1,4 @@
-name: Build Binaries with PyInstaller
+name: Build Binaries with Nuitka
 
 on:
   push:
@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt pyinstaller
+          pip install -r requirements.txt
 
       - name: Install VC++ 2013 Redistributable
         if: runner.os == 'Windows'
@@ -40,12 +40,12 @@ jobs:
       - name: Build Windows executable
         if: runner.os == 'Windows'
         run: |
-          pyinstaller --noconfirm --onefile --icon "src/LightAuth_logo .ico" main.py
+          python -m nuitka --standalone --enable-plugin=pyside6 --output-dir=dist main.py
 
       - name: Build macOS app
         if: runner.os == 'macOS'
         run: |
-          pyinstaller --noconfirm --windowed --icon "src/LightAuth_logo.icns" main.py
+          python -m nuitka --standalone --enable-plugin=pyside6 --output-dir=dist main.py
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

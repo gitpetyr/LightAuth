@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from PyQt6.QtWidgets import (
+from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QFormLayout,
     QLabel, QLineEdit, QPushButton, QDialogButtonBox,
     QTabWidget, QWidget, QMessageBox, QApplication
 )
-from PyQt6.QtCore import Qt, QRegularExpression
-from PyQt6.QtGui import QRegularExpressionValidator
+from PySide6.QtCore import Qt, QRegularExpression
+from PySide6.QtGui import QRegularExpressionValidator
 
 from models.otp_model import OTPAccount
 

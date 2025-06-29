@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from PyQt6.QtWidgets import (
+from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QFormLayout,
     QLabel, QLineEdit, QPushButton, QDialogButtonBox,
     QCheckBox, QComboBox, QGroupBox, QMessageBox
 )
-from PyQt6.QtCore import Qt
+from PySide6.QtCore import Qt
 
 
 class SettingsDialog(QDialog):

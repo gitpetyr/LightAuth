@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import pyperclip
-from PyQt6.QtWidgets import (
+from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, 
     QLabel, QPushButton, QProgressBar, QMenu, QSizePolicy
 )
-from PyQt6.QtCore import Qt, QSize, QTimer, QPropertyAnimation, QEasingCurve
-from PyQt6.QtGui import QFont, QAction, QColor, QFontMetrics
+from PySide6.QtCore import Qt, QSize, QTimer, QPropertyAnimation, QEasingCurve
+from PySide6.QtGui import QFont, QAction, QColor, QFontMetrics
 from typing import cast
-from PyQt6.QtWidgets import QListWidgetItem
+from PySide6.QtWidgets import QListWidgetItem
 
 
 class OTPItemWidget(QWidget):

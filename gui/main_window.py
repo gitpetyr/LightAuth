@@ -5,15 +5,15 @@ import time
 import threading
 import os
 import hashlib
-from PyQt6.QtWidgets import (
+from PySide6.QtWidgets import (
     QMainWindow, QVBoxLayout, QHBoxLayout, 
     QWidget, QPushButton, QLabel, QScrollArea,
     QListWidget, QListWidgetItem, QSplitter, 
     QMessageBox, QMenu, QDialog, QInputDialog, QLineEdit,
     QApplication
 )
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QSize, QPropertyAnimation, QEasingCurve
-from PyQt6.QtGui import QAction, QIcon, QFont, QPixmap
+from PySide6.QtCore import Qt, QTimer, Signal, QSize, QPropertyAnimation, QEasingCurve
+from PySide6.QtGui import QAction, QIcon, QFont, QPixmap
 
 from models.otp_model import OTPModel, OTPAccount
 from utils.config import (
@@ -34,7 +34,7 @@ from gui.animations import SlideAnimation
 class MainWindow(QMainWindow):
     """主窗口"""
     
-    update_signal = pyqtSignal()
+    update_signal = Signal()
     
     def __init__(self):
         super().__init__()
@@ -410,7 +410,7 @@ class MainWindow(QMainWindow):
         about_text = "LightAuth - 轻量级OTP认证器\n\n"
         about_text += "版本: 1.0.0\n"
         about_text += "作者: LightAuth Team\n\n"
-        about_text += "一个基于Python和PyQt6构建的轻量级OTP认证器应用程序"
+        about_text += "一个基于Python和PySide6构建的轻量级OTP认证器应用程序"
         
         # 使用带Logo的消息框
         about_box = QMessageBox(self)
