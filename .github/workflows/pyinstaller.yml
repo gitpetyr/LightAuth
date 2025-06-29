@@ -40,12 +40,12 @@ jobs:
       - name: Build Windows executable
         if: runner.os == 'Windows'
         run: |
-          python -m nuitka --standalone --assume-yes-for-downloads --show-progress --enable-plugin=pyqt6 --include-package=pyzbar --include-package-data=pyzbar --output-dir=dist main.py
+          python -m nuitka --standalone --assume-yes-for-downloads --show-progress --windows-icon-from-ico "src/LightAuth_logo.ico" --enable-plugin=pyqt6 --include-package=pyzbar --include-package-data=pyzbar --include-data-dir=src=src --output-dir=dist LightAuth.py
 
       - name: Build macOS app
         if: runner.os == 'macOS'
         run: |
-          python -m nuitka --standalone --assume-yes-for-downloads --enable-plugin=pyqt6 --output-dir=dist main.py
+          python -m nuitka --standalone --assume-yes-for-downloads --macos-create-app-bundle --macos-app-icon "src/LightAuth_logo.icns" --enable-plugin=pyqt6 --include-package=pyzbar --include-package-data=pyzbar --include-data-dir=src=src --output-dir=dist LightAuth.py
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

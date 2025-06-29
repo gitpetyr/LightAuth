@@ -408,9 +408,9 @@ class MainWindow(QMainWindow):
         logo_path = os.path.join(base_dir, "src", "LightAuth_logo.png")
         
         about_text = "LightAuth - 轻量级OTP认证器\n\n"
-        about_text += "版本: 1.0.0\n"
-        about_text += "作者: LightAuth Team\n\n"
-        about_text += "一个基于Python和PyQt6构建的轻量级OTP认证器应用程序"
+        about_text += "https://github.com/gitpetyr/LightAuth\n"
+        about_text += "By Liveless Zhong\n\n"
+        about_text += "一个基于Qt6构建的健壮的轻量级OTP认证器应用程序"
         
         # 使用带Logo的消息框
         about_box = QMessageBox(self)
