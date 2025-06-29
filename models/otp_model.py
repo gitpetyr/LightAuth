@@ -6,7 +6,7 @@ import pyotp
 import qrcode
 from io import BytesIO
 from PIL import Image, ImageQt
-from PySide6.QtGui import QPixmap
+from PyQt6.QtGui import QPixmap
 
 class OTPAccount:
     """OTP账户类，管理单个OTP账户"""

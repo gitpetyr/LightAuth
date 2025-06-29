@@ -40,12 +40,12 @@ jobs:
       - name: Build Windows executable
         if: runner.os == 'Windows'
         run: |
-          python -m nuitka --standalone --mingw64 --enable-plugin=pyside6 --output-dir=dist main.py
+          python -m nuitka --standalone --show-progress --enable-plugin=pyqt6 --include-package=pyzbar --include-package-data=pyzbar --output-dir=dist main.py
 
       - name: Build macOS app
         if: runner.os == 'macOS'
         run: |
-          python -m nuitka --standalone --enable-plugin=pyside6 --output-dir=dist main.py
+          python -m nuitka --standalone --enable-plugin=pyqt6 --output-dir=dist main.py
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

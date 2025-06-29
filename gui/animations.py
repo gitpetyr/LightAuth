@@ -5,8 +5,8 @@
 动画效果工具类
 """
 
-from PySide6.QtCore import QPropertyAnimation, QEasingCurve, QSize, QPoint, QTimer, Qt
-from PySide6.QtWidgets import QGraphicsOpacityEffect
+from PyQt6.QtCore import QPropertyAnimation, QEasingCurve, QSize, QPoint, QTimer, Qt
+from PyQt6.QtWidgets import QGraphicsOpacityEffect
 
 class FadeAnimation:
     """渐显/渐隐动画"""

@@ -2,12 +2,12 @@ import sys
 import cv2
 from typing import List, Optional
 
-from PySide6.QtWidgets import (
+from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QListWidget,
     QListWidgetItem, QComboBox, QMessageBox, QFileDialog, QApplication
 )
-from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QImage, QPixmap, QGuiApplication
+from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtGui import QImage, QPixmap, QGuiApplication
 from PIL import Image
 import numpy as np
 
@@ -210,9 +210,9 @@ class ScreenScanDialog(QDialog):
         width = qimage.width()
         height = qimage.height()
         ptr = qimage.bits()
-        # PySide6 下 bits() 返回一个 memoryview，无 setsize 方法
-        # 先转为 bytes，再构造 numpy 数组
-        arr = np.frombuffer(ptr.tobytes(), dtype=np.uint8).reshape((height, width, 4))
+        # PyQt6 的 sip.voidptr 支持 setsize，直接使用 buffer
+        ptr.setsize(width * height * 4)
+        arr = np.frombuffer(ptr, dtype=np.uint8).reshape((height, width, 4))
         pil_img = Image.fromarray(arr, 'RGBA')
 
         decoded = decode_qr_from_image(pil_img)

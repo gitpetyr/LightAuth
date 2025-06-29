@@ -3,12 +3,12 @@
 
 import json
 import os
-from PySide6.QtWidgets import (
+from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QCheckBox,
     QPushButton, QLabel, QLineEdit, QFileDialog,
     QListWidget, QListWidgetItem, QMessageBox, QGroupBox, QWidget
 )
-from PySide6.QtCore import Qt
+from PyQt6.QtCore import Qt
 from utils.config import encrypt_data
 
 class CheckableAccountItemWidget(QWidget):
