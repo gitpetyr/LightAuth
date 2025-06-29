@@ -3,6 +3,38 @@
 
 import os
 import sys
+
+# -------------------------------------------------------------
+# Dynamically select Qt binding:
+#   • macOS   -> PySide6
+#   • Windows -> PyQt6 (default)
+# All other modules continue to import from `PyQt6.*` normally.
+# -------------------------------------------------------------
+
+if sys.platform.startswith("darwin"):
+    # On macOS prefer PySide6 but keep backward-compat aliases so that
+    # existing `from PyQt6...` imports do not have to be rewritten.
+    try:
+        import importlib, types
+        import PySide6 as _PySide6
+
+        # Expose top-level alias
+        sys.modules.setdefault("PyQt6", _PySide6)
+
+        # Map commonly used sub-modules
+        for _sub in (
+            "QtCore",
+            "QtGui",
+            "QtWidgets",
+            "QtNetwork",
+            "QtSvg",
+        ):
+            sys.modules.setdefault(f"PyQt6.{_sub}", importlib.import_module(f"PySide6.{_sub}"))
+
+    except ImportError as exc:
+        # Fallback: PySide6 not available, let the regular PyQt6 import fail below
+        print("[Warning] Unable to import PySide6 on macOS →", exc, file=sys.stderr)
+
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtGui import QIcon
 from gui.main_window import MainWindow
