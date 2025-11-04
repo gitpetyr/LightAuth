@@ -1,5 +1,7 @@
 # LightAuth - 轻量级开源 OTP 认证器
 
+#已经弃用，推荐：https://authenticator.cc/
+
 > 桌面端 (Windows / macOS) 一次性密码 (TOTP) 管理器，使用 **Qt 6** 构建，可作为 Google Authenticator / Microsoft Authenticator 的本地替代方案。
 
 ![](./sample.png)
